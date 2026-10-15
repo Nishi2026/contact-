@@ -1,0 +1,271 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>District Contact Directory</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f6fa;
+    margin: 0;
+    color: #243247;
+}
+
+header {
+    background: #173b68;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+.container {
+    max-width: 1050px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+input, select {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #ccd5e0;
+    border-radius: 6px;
+    background: white;
+    font-size: 15px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #00000012;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e6ebf1;
+}
+
+th {
+    background: #e4edf8;
+}
+
+tr:hover td {
+    background: #f7faff;
+}
+
+.phone {
+    color: #075db5;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.phone:hover {
+    text-decoration: underline;
+}
+
+#count {
+    margin-bottom: 12px;
+    color: #526176;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: #68778b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>District & Area Contact Directory</h1>
+    <p>Find contact persons by district and area</p>
+</header>
+
+<div class="container">
+
+    <div class="controls">
+        <input
+            type="search"
+            id="search"
+            placeholder="Search name, area or phone..."
+            aria-label="Search contacts"
+        >
+
+        <select id="district" aria-label="Filter by district">
+            <option value="">All Districts</option>
+        </select>
+    </div>
+
+    <p id="count" aria-live="polite"></p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>District</th>
+                    <th>Area / Block</th>
+                    <th>Contact Person</th>
+                    <th>Designation</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody id="directory"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<footer>
+    District & Area Contact Directory
+</footer>
+
+<script>
+
+// REPLACE THESE SAMPLE RECORDS WITH YOUR ACTUAL CONTACT DETAILS.
+
+const contacts = [
+    {
+        district: "Aizawl",
+        area: "Aizawl East",
+        name: "Person A",
+        designation: "Counsellor",
+        phone: "9876543210"
+    },
+    {
+        district: "Aizawl",
+        area: "Aizawl West",
+        name: "Person B",
+        designation: "Outreach Worker",
+        phone: "9876543211"
+    },
+    {
+        district: "Champhai",
+        area: "Champhai Town",
+        name: "Person C",
+        designation: "Supervisor",
+        phone: "9876543212"
+    },
+    {
+        district: "Dimapur",
+        area: "Dimapur Urban",
+        name: "Person D",
+        designation: "Programme Officer",
+        phone: "9876543213"
+    },
+    {
+        district: "Kohima",
+        area: "Kohima Town",
+        name: "Person E",
+        designation: "Field Coordinator",
+        phone: "9876543214"
+    }
+];
+
+const searchInput = document.getElementById("search");
+const districtSelect = document.getElementById("district");
+const directory = document.getElementById("directory");
+const count = document.getElementById("count");
+
+function addTextCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value;
+    row.appendChild(cell);
+}
+
+function populateDistricts() {
+    const districts = [...new Set(
+        contacts.map(contact => contact.district)
+    )].sort();
+
+    districts.forEach(district => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+    });
+}
+
+function renderDirectory() {
+    const query = searchInput.value.toLowerCase().trim();
+    const selectedDistrict = districtSelect.value;
+
+    const filtered = contacts.filter(contact => {
+        const matchesDistrict =
+            !selectedDistrict ||
+            contact.district === selectedDistrict;
+
+        const searchableText = [
+            contact.district,
+            contact.area,
+            contact.name,
+            contact.designation,
+            contact.phone
+        ].join(" ").toLowerCase();
+
+        return matchesDistrict && searchableText.includes(query);
+    });
+
+    directory.replaceChildren();
+
+    filtered.forEach(contact => {
+        const row = document.createElement("tr");
+
+        addTextCell(row, contact.district);
+        addTextCell(row, contact.area);
+        addTextCell(row, contact.name);
+        addTextCell(row, contact.designation);
+
+        const phoneCell = document.createElement("td");
+        const phoneLink = document.createElement("a");
+
+        phoneLink.className = "phone";
+        phoneLink.href = "tel:" + contact.phone;
+        phoneLink.textContent = contact.phone;
+
+        phoneCell.appendChild(phoneLink);
+        row.appendChild(phoneCell);
+
+        directory.appendChild(row);
+    });
+
+    count.textContent =
+        `Showing ${filtered.length} of ${contacts.length} contacts`;
+}
+
+searchInput.addEventListener("input", renderDirectory);
+districtSelect.addEventListener("change", renderDirectory);
+
+populateDistricts();
+renderDirectory();
+
+</script>
+
+</body>
+</html>
+```
