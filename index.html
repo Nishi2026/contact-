@@ -1,271 +1,112 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Directory: OD Management Team MACS</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="District and area-wise contact directory">
+<title>OD CRT Contact Directory</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f3f6fa;
-    margin: 0;
-    color: #243247;
-}
-
-header {
-    background: #173b68;
-    color: white;
-    text-align: center;
-    padding: 25px 15px;
-}
-
-header h1 {
-    margin: 0 0 8px;
-}
-
-.container {
-    max-width: 1050px;
-    margin: 25px auto;
-    padding: 15px;
-}
-
-.controls {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-input, select {
-    flex: 1;
-    min-width: 200px;
-    padding: 12px;
-    border: 1px solid #ccd5e0;
-    border-radius: 6px;
-    background: white;
-    font-size: 15px;
-}
-
-.table-wrapper {
-    overflow-x: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px #00000012;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 650px;
-}
-
-th, td {
-    padding: 14px;
-    text-align: left;
-    border-bottom: 1px solid #e6ebf1;
-}
-
-th {
-    background: #e4edf8;
-}
-
-tr:hover td {
-    background: #f7faff;
-}
-
-.phone {
-    color: #075db5;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.phone:hover {
-    text-decoration: underline;
-}
-
-#count {
-    margin-bottom: 12px;
-    color: #526176;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 13px;
-    color: #68778b;
-}
+:root{--navy:#153b63;--blue:#1769aa;--bg:#f3f6fa;--ink:#1e293b;--muted:#64748b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif}
+header{background:linear-gradient(120deg,#12365d,#1e6095);color:#fff;padding:30px 18px;text-align:center}
+header h1{margin:0 0 7px;font-size:clamp(23px,4vw,32px)}
+header p{margin:0;color:#e2edf8}
+main{max-width:1250px;margin:24px auto;padding:0 16px}
+.toolbar{background:#fff;padding:16px;border-radius:12px;box-shadow:0 3px 14px #173b6812;display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+.summary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);margin:16px 2px}
+.table-wrap{overflow-x:auto;background:#fff;border-radius:12px;box-shadow:0 3px 14px #173b6812}
+table{border-collapse:collapse;width:100%;min-width:950px}
+th,td{padding:12px 13px;text-align:left;border-bottom:1px solid #e8edf3;vertical-align:top}
+th{background:#eaf1f8;color:#183b60;position:sticky;top:0;white-space:nowrap}
+tbody tr:hover{background:#f8fbff}
+td.area{min-width:260px}
+td.name{min-width:170px}
+.phone a{display:inline-block;color:var(--blue);text-decoration:none;font-weight:600;margin:1px 0}
+.phone a:hover{text-decoration:underline}
+.phone-label{color:var(--muted);font-size:12px;margin-right:4px}
+.empty{text-align:center;padding:28px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
+@media(max-width:720px){.toolbar{grid-template-columns:1fr}.summary{font-size:14px}}
 </style>
 </head>
-
 <body>
-
 <header>
-    <h1>Contact Directory OD Management Team MACS</h1>
-    <p>Find contact persons by district and area</p>
+  <h1>OD CRT Contact Directory</h1>
+  <p>District-wise and area-wise contact information</p>
 </header>
-
-<div class="container">
-
-    <div class="controls">
-        <input
-            type="search"
-            id="search"
-            placeholder="Search name, area or phone..."
-            aria-label="Search contacts"
-        >
-
-        <select id="district" aria-label="Filter by district">
-            <option value="">All Districts</option>
-        </select>
-    </div>
-
-    <p id="count" aria-live="polite"></p>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>District</th>
-                    <th>Area / Block</th>
-                    <th>Contact Person</th>
-                    <th>Designation</th>
-                    <th>Phone Number</th>
-                </tr>
-            </thead>
-            <tbody id="directory"></tbody>
-        </table>
-    </div>
-
-</div>
-
-<footer>
-    District & Area Contact Directory
-</footer>
-
+<main>
+  <section class="toolbar" aria-label="Directory filters">
+    <input id="search" type="search" placeholder="Search district, area, contact, NGO or phone…" aria-label="Search directory">
+    <select id="district" aria-label="Filter by district"><option value="">All districts</option></select>
+    <select id="ngo" aria-label="Filter by TI NGO"><option value="">All TI NGO names</option></select>
+  </section>
+  <div class="summary">
+    <span id="count" aria-live="polite">Loading contacts…</span>
+    <span>Tap a phone number to call</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Sl. No.</th><th>District</th><th>Area / Location</th>
+        <th>Contact Person</th><th>Designation</th><th>TI NGO Name</th><th>Phone Number(s)</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<footer>OD CRT Contact Directory</footer>
+<script src="contacts.js"></script>
 <script>
+const searchEl=document.getElementById('search');
+const districtEl=document.getElementById('district');
+const ngoEl=document.getElementById('ngo');
+const rowsEl=document.getElementById('rows');
+const countEl=document.getElementById('count');
 
-// REPLACE THESE SAMPLE RECORDS WITH YOUR ACTUAL CONTACT DETAILS.
-
-const contacts = [
-    {
-        district: "Imphal East",
-        area: "New Checkon Bazar",
-        name: "Nishi RK",
-        designation: "ORW, CF",
-        phone: "9612428344"
-    },
-    {
-        district: "Imphal East",
-        area: "Konung Manang",
-        name: "Sanjoy",
-        designation: "Outreach Worker",
-        phone: "9876543211"
-    },
-    {
-        district: "Imphal West",
-        area: "North AOC",
-        name: "Boboy Singh",
-        designation: "TI Nurse",
-        phone: "9876543212"
-    },
-    {
-        district: "Imphal West",
-        area: "Minuthong",
-        name: "Tomba Singh",
-        designation: "Peer educator",
-        phone: "9876543213"
-    },
-    {
-        district: "Imphal West",
-        area: "ISBT Complex and nearby area",
-        name: "Maxim",
-        designation: "Field Coordinator",
-        phone: "9876543214"
-    }
-];
-
-const searchInput = document.getElementById("search");
-const districtSelect = document.getElementById("district");
-const directory = document.getElementById("directory");
-const count = document.getElementById("count");
-
-function addTextCell(row, value) {
-    const cell = document.createElement("td");
-    cell.textContent = value;
-    row.appendChild(cell);
+function addOptions(select, values){
+  [...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b))
+    .forEach(value=>{const o=document.createElement('option');o.value=value;o.textContent=value;select.appendChild(o)});
 }
+addOptions(districtEl,CONTACTS.map(x=>x.district));
+addOptions(ngoEl,CONTACTS.map(x=>x.ngo));
 
-function populateDistricts() {
-    const districts = [...new Set(
-        contacts.map(contact => contact.district)
-    )].sort();
-
-    districts.forEach(district => {
-        const option = document.createElement("option");
-        option.value = district;
-        option.textContent = district;
-        districtSelect.appendChild(option);
-    });
+function cell(row,text,className){
+  const td=document.createElement('td'); if(className)td.className=className;
+  td.textContent=text || '—'; row.appendChild(td); return td;
 }
-
-function renderDirectory() {
-    const query = searchInput.value.toLowerCase().trim();
-    const selectedDistrict = districtSelect.value;
-
-    const filtered = contacts.filter(contact => {
-        const matchesDistrict =
-            !selectedDistrict ||
-            contact.district === selectedDistrict;
-
-        const searchableText = [
-            contact.district,
-            contact.area,
-            contact.name,
-            contact.designation,
-            contact.phone
-        ].join(" ").toLowerCase();
-
-        return matchesDistrict && searchableText.includes(query);
+function render(){
+  const q=searchEl.value.trim().toLocaleLowerCase();
+  const district=districtEl.value, ngo=ngoEl.value;
+  const filtered=CONTACTS.filter(c=>{
+    const hay=[c.sl,c.district,c.area,c.name,c.designation,c.ngo,c.phone1,c.phone2].join(' ').toLocaleLowerCase();
+    return (!q||hay.includes(q))&&(!district||c.district===district)&&(!ngo||c.ngo===ngo);
+  });
+  rowsEl.replaceChildren();
+  if(!filtered.length){
+    const tr=document.createElement('tr'),td=document.createElement('td');
+    td.colSpan=7;td.className='empty';td.textContent='No matching contacts found.';
+    tr.appendChild(td);rowsEl.appendChild(tr);
+  } else filtered.forEach(c=>{
+    const tr=document.createElement('tr');
+    cell(tr,c.sl);cell(tr,c.district);cell(tr,c.area,'area');cell(tr,c.name,'name');
+    cell(tr,c.designation);cell(tr,c.ngo);
+    const phoneTd=cell(tr,'','phone');
+    [c.phone1,c.phone2].filter(Boolean).forEach((number,i)=>{
+      if(i)phoneTd.appendChild(document.createElement('br'));
+      const a=document.createElement('a');
+      a.href='tel:'+number.replace(/[^\d+]/g,'');
+      a.textContent=number;
+      a.setAttribute('aria-label','Call '+number);
+      phoneTd.appendChild(a);
     });
-
-    directory.replaceChildren();
-
-    filtered.forEach(contact => {
-        const row = document.createElement("tr");
-
-        addTextCell(row, contact.district);
-        addTextCell(row, contact.area);
-        addTextCell(row, contact.name);
-        addTextCell(row, contact.designation);
-
-        const phoneCell = document.createElement("td");
-        const phoneLink = document.createElement("a");
-
-        phoneLink.className = "phone";
-        phoneLink.href = "tel:" + contact.phone;
-        phoneLink.textContent = contact.phone;
-
-        phoneCell.appendChild(phoneLink);
-        row.appendChild(phoneCell);
-
-        directory.appendChild(row);
-    });
-
-    count.textContent =
-        `Showing ${filtered.length} of ${contacts.length} contacts`;
+    rowsEl.appendChild(tr);
+  });
+  countEl.textContent=`Showing ${filtered.length} of ${CONTACTS.length} contact records`;
 }
-
-searchInput.addEventListener("input", renderDirectory);
-districtSelect.addEventListener("change", renderDirectory);
-
-populateDistricts();
-renderDirectory();
-
+[searchEl,districtEl,ngoEl].forEach(el=>el.addEventListener(el===searchEl?'input':'change',render));
+render();
 </script>
-
 </body>
 </html>
-```
