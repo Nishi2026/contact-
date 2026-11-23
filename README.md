@@ -1,4 +1,4 @@
-# OD CRT Contact Directory
+# MACS OD CRT Contact Directory
 
 A free, static, mobile-friendly district and area contact directory for GitHub Pages.
 
